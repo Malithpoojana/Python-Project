@@ -3,14 +3,19 @@ from datetime import datetime
 
 class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    account_number = db.Column(db.String(20), unique=True, nullable=False)
-    account_type = db.Column(db.String(20), nullable=False)  # savings, checking, etc.
-    account_name = db.Column(db.String(100), nullable=True)  # Optional name for the account
+    account_number = db.Column(db.String(30), unique=True, nullable=False)
+
+    account_type = db.Column(db.String(30), nullable=False)
+
+    account_name = db.Column(db.String(90), nullable=True)
     description = db.Column(db.String(200), nullable=True)  # Optional description
-    balance = db.Column(db.Float, nullable=False, default=0.0)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    from sqlalchemy import Numeric
+    balance = db.Column(Numeric(12, 2), nullable=False, default=0.00)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, nullable=False, default=True)  # For soft delete
+    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)
+
     transactions_from = db.relationship('Transaction', 
                                       foreign_keys='Transaction.from_account_id',
                                       backref='from_account', 
@@ -30,5 +35,4 @@ class Account(db.Model):
             'balance': self.balance,
             'user_id': self.user_id,
             'created_at': self.created_at.isoformat(),
-            'is_active': self.is_active
-        } 
+            'is_active': self.is_active }

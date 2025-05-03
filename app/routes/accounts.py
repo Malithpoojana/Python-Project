@@ -17,7 +17,7 @@ MAX_ACCOUNTS = 2
 @bp.route('', methods=['GET'])
 @jwt_required()
 def get_accounts():
-    user_id = int(get_jwt_identity())
+    user_id = get_jwt_identity()
     
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
@@ -48,7 +48,7 @@ def get_accounts():
 @bp.route('/<int:account_id>', methods=['GET'])
 @jwt_required()
 def get_account(account_id):
-    user_id = int(get_jwt_identity())
+    user_id = get_jwt_identity()
     
     account = Account.query.filter(
         Account.id == account_id
@@ -65,7 +65,7 @@ def get_account(account_id):
 @bp.route('', methods=['POST'])
 @jwt_required()
 def create_account():
-    user_id = int(get_jwt_identity())
+    user_id = get_jwt_identity()
     data = request.get_json()
     
     account_type = data.get('account_type') or data.get('type')
@@ -88,7 +88,7 @@ def create_account():
         initial_balance = float(initial_balance)
         if initial_balance < -50.0:
             return error_response('Initial balance cannot be less than -50.00', 400)
-    except (ValueError, TypeError):
+    except (ValueError ,TypeError):
         return error_response('Initial balance must be a valid number', 400)
     
     import uuid
@@ -127,7 +127,7 @@ def create_account():
 @bp.route('/<int:account_id>', methods=['PUT'])
 @jwt_required(fresh=True)
 def update_account(account_id):
-    user_id = int(get_jwt_identity())
+    user_id = get_jwt_identity()
     data = request.get_json()
     
     account = Account.query.filter(
@@ -160,7 +160,7 @@ def update_account(account_id):
 @bp.route('/<int:account_id>', methods=['DELETE'])
 @jwt_required(fresh=True)
 def delete_account(account_id):
-    user_id = int(get_jwt_identity())
+    user_id = get_jwt_identity()
     
     account = Account.query.filter(
         Account.id == account_id, 
@@ -180,7 +180,7 @@ def delete_account(account_id):
 @bp.route('/<int:account_id>/transactions', methods=['GET'])
 @jwt_required()
 def get_account_transactions(account_id):
-    user_id = int(get_jwt_identity())
+    user_id = get_jwt_identity()
     
     account = Account.query.filter(
         Account.id == account_id, 
@@ -235,8 +235,8 @@ def get_account_transactions(account_id):
         search_term = f'%{search}%'
         query = query.filter(Transaction.description.ilike(search_term))
         
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
+    page = request.args.get('page', 1, type=float)
+    per_page = request.args.get('per_page', 20, type=float)
     
     if page < 1 or per_page < 1 or per_page > 100:
         return error_response('Invalid pagination parameters. Page and per_page must be positive, and per_page cannot exceed 100', 400)
@@ -256,7 +256,7 @@ def get_account_transactions(account_id):
         'tx_list': transactions,       
         'pg': page,
         'per_pg': per_page,
-        'total_items': paginated_transactions.total
-    }
+        'total_items': paginated_transactions.total }
+
         
     return jsonify(response)

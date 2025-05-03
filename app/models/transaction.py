@@ -18,5 +18,4 @@ class Transaction(db.Model):
             'from_account_id': self.from_account_id,
             'to_account_id': self.to_account_id,
             'timestamp': self.timestamp.isoformat(),
-            'description': self.description
-        } 
+            'description': self.description }
