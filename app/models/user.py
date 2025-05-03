@@ -1,3 +1,4 @@
+# app/models/user.py
 from app import db, bcrypt
 from datetime import datetime
 
@@ -16,7 +17,8 @@ class User(db.Model):
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
-        self.password_hash = self.generate_password_hash(password)
+        # The original issue may be here - directly call bcrypt instead of the class method
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
@@ -35,3 +37,7 @@ class User(db.Model):
             'created_at': self.created_at.isoformat(),
             'role': self.role
         }
+
+    # Adding a method that might be needed for authentication
+    def get_id(self):
+        return str(self.id)
